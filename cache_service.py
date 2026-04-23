@@ -38,9 +38,9 @@ def is_fresh(entry):
     return age_in_seconds < CACHE_TTL
 
 
+
 # route 1: GET /cache/<city>
 # the gateway calls this to ask if there is fresh data for a city
-
 
 @app.route("/cache/<city>", methods=["GET"])
 def get_cache(city):
@@ -73,6 +73,7 @@ def get_cache(city):
     }), 200                       # 200 means everything worked
 
 
+
 # route 2: POST /cache/<city>
 # the gateway calls this after fetching fresh data from the weather service, asking to store it
 
@@ -100,7 +101,6 @@ def store_cache(city):
 
 
 
-
 # route 3: GET /cache/stats
 # the gateway calls this when someone asks for system statistics, returns how many hits, misses and stores have happened
 
@@ -114,7 +114,6 @@ def get_stats():
         "cities_cached": len(cache),
         "cities":        list(cache.keys())
     }), 200
-
 
 
 
