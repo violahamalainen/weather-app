@@ -50,8 +50,9 @@ def get_weather():
     # display the clean weather information
     print(f"City: {weather['city'].title()}")
     print(f"Temperature: {w['temperature']} {w['temperature_unit']}")
-    print(f"Wind: {w['wind_speed']} {w['wind_speed_unit']}")
+    print(f"Wind: {w['wind_speed']} {w['wind_speed_unit']} "f"(direction: {w['wind_direction']}{w['wind_direction_unit']})")
     print(f"Humidity: {w['humidity']} {w['humidity_unit']}")
+    print(f"Precipitation: {w['precipitation']} {w['precipitation_unit']}")
     print(f"UV Index: {w['uv_index']}")
     print()
 

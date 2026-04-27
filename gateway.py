@@ -50,48 +50,50 @@ def get_weather(city: str):
         weather_res = requests.get(f"{WEATHER_URL}/{city}", timeout=3)
 
         # if weather service returns error (e.g. city not found)
-        if weather_res.status_code != 200:
-            return weather_res.json()
-
         # extract fresh weather data
-        weather_data = weather_res.json()
+        if weather_res.status_code == 200:
+            weather_data = weather_res.json()
+        
+            # store to cache
+            try:
+                requests.post(f"{CACHE_URL}/{city}", json=weather_data, timeout=2)
 
+            except:
+                print("Cache store failed")
+
+            return {
+                "source": "live",
+                "data": weather_data
+            }
+
+        return weather_res.json()
+    
     except:
-        # if weather service is down, try to return old cached data
-        try:
-            cache_res = requests.get(f"{CACHE_URL}/{city}", timeout=2)
-
-            if cache_res.status_code == 200:
-                data = cache_res.json()
-
-                return {
-                    "source": "stale-cache",   # "stale" indicates old cached data
-                    "message": "weather service down, showing old data",
-                    "data": data["data"]
-                }
-
-        except:
-            pass
-
-        # returning error message if both weather service and cache fail
-        return {
-            "error": "weather service unavailable and no cache data"
-        }
+        pass
 
 
-    # storing the data to cache for improving performance
-    # with following requests
+    # try cache again (stale data logic)
     try:
-        requests.post(f"{CACHE_URL}/{city}", json=weather_data, timeout=2)
-    except:
-        # cache failure should not break the system
-        print("Failed to store in cache")
+        cache_res = requests.get(f"{CACHE_URL}/{city}", timeout=2)
 
-    # return fresh data to client
+        if cache_res.status_code == 200:
+            data = cache_res.json()
+
+            return {
+                "source": "stale-cache",
+                "message": "weather service unavailable, showing cached data",
+                "data": data["data"]
+            }
+
+    except:
+        pass
+
+
+    # complete and handle failure
     return {
-        "source": "live",
-        "data": weather_data
+        "error": "weather service unavailable and no cache data"
     }
+        
 
 
 
