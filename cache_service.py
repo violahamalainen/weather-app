@@ -38,9 +38,9 @@ def is_fresh(entry):
     return age_in_seconds < CACHE_TTL
 
 
-
 # route 1: GET /cache/<city>
 # the gateway calls this to ask if there is fresh data for a city
+
 
 @app.route("/cache/<city>", methods=["GET"])
 def get_cache(city):
@@ -73,7 +73,6 @@ def get_cache(city):
     }), 200                       # 200 means everything worked
 
 
-
 # route 2: POST /cache/<city>
 # the gateway calls this after fetching fresh data from the weather service, asking to store it
 
@@ -100,10 +99,22 @@ def store_cache(city):
     return jsonify({"message": "stored successfully"}), 200
 
 
+# route 3: GET /cache/stale/<city>
+# only used as a fallback when the weather service is down
+# returns data even if it's expired, there is no freshness check
 
-# route 3: GET /cache/stats
+@app.route("/cache/stale/<city>", methods=["GET"])
+def get_stale(city):
+    city = city.lower()
+    if city not in cache:
+        return jsonify({"error": "not in cache"}), 404
+    # return data even if expired — no freshness check
+    entry = cache[city]
+    return jsonify({"source": "stale-cache", "data": entry["data"]}), 200
+
+
+# route 4: GET /cache/stats
 # the gateway calls this when someone asks for system statistics, returns how many hits, misses and stores have happened
-
 
 @app.route("/cache/stats", methods=["GET"])
 def get_stats():
@@ -114,6 +125,7 @@ def get_stats():
         "cities_cached": len(cache),
         "cities":        list(cache.keys())
     }), 200
+
 
 
 
