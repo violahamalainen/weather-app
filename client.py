@@ -69,7 +69,7 @@ def get_stats():
         data = res.json()
 
         # display the clean stats information
-        print("\nSystem stats:")
+        print("\n--System stats--")
         print(f"Cached cities: {data['cities_cached']}")
         print(f"Hits: {data['hits']}")
         print(f"Misses: {data['misses']}")
@@ -93,7 +93,7 @@ def main():
         print("2) Show stats")
         print("0) Exit")
 
-        choice = input("\nEnter choice: ").strip()
+        choice = input("Enter choice: ").strip()
 
         if choice == "1":
             get_weather()
