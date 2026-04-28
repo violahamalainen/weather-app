@@ -65,8 +65,10 @@ def get_weather(city: str):
                 "source": "live",
                 "data": weather_data
             }
-
-        return weather_res.json()
+        
+        elif weather_res.status_code != 503:
+            # 404 = city not found → return
+            return weather_res.json()
     
     except:
         pass
@@ -74,7 +76,7 @@ def get_weather(city: str):
 
     # try cache again (stale data logic)
     try:
-        cache_res = requests.get(f"{CACHE_URL}/{city}", timeout=2)
+        cache_res = requests.get(f"{CACHE_URL}/stale/{city}", timeout=2)
 
         if cache_res.status_code == 200:
             data = cache_res.json()
@@ -94,7 +96,6 @@ def get_weather(city: str):
         "error": "weather service unavailable and no cache data"
     }
         
-
 
 
 # route 2: GET /stats
